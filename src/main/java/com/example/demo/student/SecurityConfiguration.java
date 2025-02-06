@@ -2,16 +2,22 @@ package com.example.demo.student;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.example.demo.student.filters.JwtRequestFilter;
+
 import static org.springframework.security.config.Customizer.withDefaults;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Configuration
 @EnableWebSecurity
@@ -31,29 +37,70 @@ public class SecurityConfiguration {
     //     return new InMemoryUserDetailsManager(user1, user2);
     // }
 
-    // Authentication method
-    @Bean
-    public JdbcUserDetailsManager jdbcUserDetailsManager() {
-        return new JdbcUserDetailsManager();
-    }
+    // Data Source Bean
+    // Default Data Source pointing to POSTGRESQL
+    // @Autowired
+    // DataSource datasource;
 
+    // Authentication method
+    // @Bean
+    // public JdbcUserDetailsManager jdbcUserDetailsManager() {
+    //     JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager();
+    //     jdbcUserDetailsManager.setDataSource(datasource);
+    //     jdbcUserDetailsManager.setUsersByUsernameQuery("select username, password, enabled "
+    //         + "from users "
+    //         + "where username = ?");
+    //     jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("select username, authority "
+    //         + "from authorities "
+    //         + "where username = ?");
+    //     return jdbcUserDetailsManager;
+    // }
+
+    @Autowired
+    private MyStudentDetailsService userDetailsService;
+
+    @Autowired
+    private JwtRequestFilter jwtRequestFilter;
+
+    public UserDetailsService userDetailsService() {
+        return userDetailsService;
+    }
+    
     // Authroization method
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(authorizeRequests ->
+    protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+        .csrf(
+            csrf -> csrf
+            .ignoringRequestMatchers("/authenticate")
+        )
+            .authorizeHttpRequests(authorizeRequests ->
             authorizeRequests
-            .requestMatchers("studentList/**").hasRole("TEACHER")
-            .requestMatchers("student/**").hasAnyRole("STUDENT", "TEACHER")
-            .requestMatchers("/**").permitAll()
+            .requestMatchers("/studentList/**").hasRole("TEACHER")
+            .requestMatchers("/student/**").hasAnyRole("STUDENT", "TEACHER")
+            .requestMatchers("/authenticate").permitAll()
+            .requestMatchers("/").permitAll()
             .anyRequest().authenticated()
         )
+        .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .formLogin(withDefaults());
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
     }
 
     @Bean
+    public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    // @Bean
+    // public PasswordEncoder passwordEncoder() {
+    //     return new BCryptPasswordEncoder();
+    // }
+
+    @Bean 
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return NoOpPasswordEncoder.getInstance();
     }
 }

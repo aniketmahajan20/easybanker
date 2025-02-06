@@ -3,6 +3,10 @@ package com.example.demo.student;
 import java.time.LocalDate;
 import java.time.Period;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,7 +17,7 @@ import jakarta.persistence.Transient;
 
 @Entity
 @Table
-public class Student {
+public class Student implements UserDetailsService{
     @Id
     @SequenceGenerator(
         name = "student_sequence",
@@ -96,5 +100,11 @@ public class Student {
                 ", dob=" + dob +
                 ", email='" + email + '\'' +
                 '}';
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'loadUserByUsername'");
     }
 }
