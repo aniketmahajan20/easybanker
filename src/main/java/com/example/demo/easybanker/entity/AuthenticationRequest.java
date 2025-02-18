@@ -1,4 +1,4 @@
-package com.example.demo.student.models;
+package com.example.demo.easybanker.entity;
 
 public class AuthenticationRequest {
 
@@ -28,4 +28,6 @@ public class AuthenticationRequest {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    
 }

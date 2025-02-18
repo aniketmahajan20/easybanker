@@ -1,7 +1,7 @@
-package com.example.demo.student.models;
+package com.example.demo.easybanker.entity;
 
 public class AuthenticationResponse {
-    
+
     private final String jwt;
 
     public AuthenticationResponse(String jwt) {
