@@ -6,16 +6,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.demo.easybanker.filters.JwtRequestFilter;
-
-// import com.example.demo.student.filters.JwtRequestFilter;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -70,16 +67,12 @@ public class SecurityConfiguration {
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-        .csrf(
-            csrf -> csrf
-            .ignoringRequestMatchers("/authenticate")
-            // .ignoringRequestMatchers("/registration")
-        )
+        .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorizeRequests ->
             authorizeRequests
             .requestMatchers("/welcome").hasAuthority("ADMIM")
+            .requestMatchers("/registration/**").permitAll()
             .requestMatchers("/authenticate").permitAll()
-            .requestMatchers("/registration").permitAll()
             .requestMatchers("/").permitAll()
             .anyRequest().authenticated()
         )
