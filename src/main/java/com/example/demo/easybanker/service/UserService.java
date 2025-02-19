@@ -30,7 +30,6 @@ public class UserService implements UserDetailsService {
     }
 
     public String signUpUser(User user) {
-        // TODO Implementation pending
         boolean userExists = userRepository.findUserByEmail(user.getEmail()).isPresent();
         if(userExists){
             throw new IllegalStateException("User already exists.");

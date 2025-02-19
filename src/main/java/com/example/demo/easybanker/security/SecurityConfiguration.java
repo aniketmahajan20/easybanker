@@ -77,15 +77,14 @@ public class SecurityConfiguration {
         )
             .authorizeHttpRequests(authorizeRequests ->
             authorizeRequests
-            .requestMatchers("/studentList/**").hasRole("TEACHER")
-            .requestMatchers("/student/**").hasAnyRole("STUDENT", "TEACHER")
+            .requestMatchers("/welcome").hasAuthority("ADMIM")
             .requestMatchers("/authenticate").permitAll()
             .requestMatchers("/registration").permitAll()
             .requestMatchers("/").permitAll()
             .anyRequest().authenticated()
         )
-        .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .formLogin(withDefaults());
+        .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        // .formLogin(withDefaults());
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
