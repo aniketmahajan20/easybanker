@@ -9,8 +9,8 @@ import io.micrometer.common.lang.Nullable;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "transactions")
-public class Transactions {
+@Table(name = "transaction")
+public class Transaction {
     
     @Id
     @SequenceGenerator(
@@ -23,6 +23,9 @@ public class Transactions {
         generator = "transaction_sequence"
     )
     private Long id;
+
+    @Column(nullable = false)
+    private String reference_id; 
 
     @Column(nullable = false)
     private TransactionType transactionType;
@@ -39,10 +42,7 @@ public class Transactions {
     @Column(nullable = false)
     private TransactionStatus transactionStatus;
 
-    @ManyToOne
-    @JoinColumn(
-        name = "transaction_initiator",
-        nullable = false)
+    @Column(nullable = false)
     private User transactionInitiator;
 
     private String transactionDescription;
@@ -50,10 +50,10 @@ public class Transactions {
     
     private String transactionRemarks;
 
-    public Transactions() {
+    public Transaction() {
     }
 
-    public Transactions(TransactionType transactionType, LocalDateTime transactionDate, double transactionAmount,
+    public Transaction(TransactionType transactionType, LocalDateTime transactionDate, double transactionAmount,
             String transactionReceiver, TransactionStatus transactionStatus, User transactionInitiator, @Nullable String transactionDescription,
             @Nullable String transactionRemarks) {
         this.transactionType = transactionType;

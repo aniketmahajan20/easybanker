@@ -1,13 +1,15 @@
 package com.example.demo.easybanker.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.easybanker.entity.Token;
 import com.example.demo.easybanker.entity.User;
@@ -16,8 +18,11 @@ import com.example.demo.easybanker.repository.UserRepository;
 @Service
 public class UserService implements UserDetailsService {
     
+    @Autowired
     private final UserRepository userRepository;
+    @Autowired
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
     private final TokenService tokenService;
 
     public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, TokenService tokenService) {
@@ -28,10 +33,14 @@ public class UserService implements UserDetailsService {
     private final static String USER_NOT_FOUND_MSG = "User with email %s not found";
     
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public User loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findUserByEmail(email)
             .orElseThrow(() -> new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG, email)));
     }
+
+    // public String execute_transaction(User user, TransactionRequest transactionRequest) {
+    //     String reference_id  = 
+    // }
 
     public String signUpUser(User user) {
         boolean userExists = userRepository.findUserByEmail(user.getEmail()).isPresent();
@@ -55,5 +64,21 @@ public class UserService implements UserDetailsService {
 
     public int enableUser(String email){
         return userRepository.enableUser(email);
+    }
+
+    public int getBalance(User user){
+        return user.getBalance();
+    }
+
+    @Transactional
+    public boolean updateUserBalance(String email, int newBalance) {
+        Optional<User> userOptional  = userRepository.findUserByEmail(email);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setBalance(newBalance);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
     }
 }

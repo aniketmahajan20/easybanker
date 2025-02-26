@@ -67,15 +67,18 @@ public class SecurityConfiguration {
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-        .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(authorizeRequests ->
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(authorizeRequests ->
             authorizeRequests
-            .requestMatchers("/welcome").hasAuthority("ADMIM")
+            .requestMatchers("/welcome").hasRole("ADMIN")
+            .requestMatchers("/balance").hasAnyRole("ADMIN","USER")
+            .requestMatchers("/update-balance").hasRole("USER")
             .requestMatchers("/registration/**").permitAll()
             .requestMatchers("/authenticate").permitAll()
             .requestMatchers("/").permitAll()
             .anyRequest().authenticated()
         )
+        .formLogin(formLogin -> formLogin.disable())
         .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         // .formLogin(withDefaults());
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
