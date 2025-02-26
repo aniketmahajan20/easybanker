@@ -66,12 +66,12 @@ public class UserService implements UserDetailsService {
         return userRepository.enableUser(email);
     }
 
-    public int getBalance(User user){
+    public double getBalance(User user){
         return user.getBalance();
     }
 
     @Transactional
-    public boolean updateUserBalance(String email, int newBalance) {
+    public boolean updateUserBalance(String email, double newBalance) {
         Optional<User> userOptional  = userRepository.findUserByEmail(email);
         if (userOptional.isPresent()) {
             User user = userOptional.get();

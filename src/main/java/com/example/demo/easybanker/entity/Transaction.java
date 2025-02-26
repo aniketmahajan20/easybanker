@@ -25,18 +25,21 @@ public class Transaction {
     private Long id;
 
     @Column(nullable = false)
-    private String reference_id; 
+    private String referenceId; 
 
     @Column(nullable = false)
     private TransactionType transactionType;
 
     @Column(nullable = false)
-    private LocalDateTime transactionDate;
+    private LocalDateTime transactionStartedAt;
+
+    @Column
+    private LocalDateTime transactionCompletedAt;
 
     @Column(nullable = false)
     private double transactionAmount;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String transactionReceiver;
 
     @Column(nullable = false)
@@ -53,11 +56,13 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(TransactionType transactionType, LocalDateTime transactionDate, double transactionAmount,
-            String transactionReceiver, TransactionStatus transactionStatus, User transactionInitiator, @Nullable String transactionDescription,
-            @Nullable String transactionRemarks) {
+    public Transaction(String referenceId, TransactionType transactionType, LocalDateTime transactionStartedAt, @Nullable LocalDateTime transactionCompletedAt,
+             double transactionAmount, @Nullable String transactionReceiver, TransactionStatus transactionStatus, User transactionInitiator, 
+             @Nullable String transactionDescription, @Nullable String transactionRemarks) {
+        this.referenceId = referenceId;
         this.transactionType = transactionType;
-        this.transactionDate = transactionDate;
+        this.transactionStartedAt = transactionStartedAt;
+        this.transactionCompletedAt = transactionCompletedAt;
         this.transactionAmount = transactionAmount;
         this.transactionReceiver = transactionReceiver;
         this.transactionStatus = transactionStatus;
@@ -82,12 +87,20 @@ public class Transaction {
         this.transactionType = transactionType;
     }
 
-    public LocalDateTime getTransactionDate() {
-        return transactionDate;
+    public LocalDateTime getTransactionStartedAt() {
+        return transactionStartedAt;
     }
 
-    public void setTransactionDate(LocalDateTime transactionDate) {
-        this.transactionDate = transactionDate;
+    public void setTransactionStartedAt(LocalDateTime transactionStartedAt) {
+        this.transactionStartedAt = transactionStartedAt;
+    }
+
+    public LocalDateTime getTransactionCompletedAt() {
+        return transactionCompletedAt;
+    }
+
+    public void setTransactionCompletedAt(LocalDateTime transactionCompletedAt) {
+        this.transactionCompletedAt = transactionCompletedAt;
     }
 
     public double getTransactionAmount() {
@@ -138,10 +151,18 @@ public class Transaction {
         this.transactionReceiver = transactionReceiver;
     }
 
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
     @Override
     public String toString() {
-        return "Transactions [id=" + id + ", transactionAmount=" + transactionAmount + ", transactionDate="
-                + transactionDate + ", transactionDescription=" + transactionDescription + ", transactionInitiator="
+        return "Transactions [id=" + id + ", referenceId=" + referenceId + ", transactionAmount=" + transactionAmount + ", transactionStartedAt="
+                + transactionStartedAt + ", transactionCompletedAt=" + transactionCompletedAt + ", transactionDescription=" + transactionDescription + ", transactionInitiator="
                 + transactionInitiator + ", transactionReceiver=" + transactionReceiver + ", transactionRemarks="
                 + transactionRemarks + ", transactionStatus=" + transactionStatus + ", transactionType=" + transactionType
                 + "]";
