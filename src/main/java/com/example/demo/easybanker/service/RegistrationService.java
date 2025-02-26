@@ -24,7 +24,7 @@ public class RegistrationService {
         this.tokenService  = tokenService;
     }
 
-    public String register(RegistrationRequest request) {
+    public String register(RegistrationRequest request, String currentUrl) {
         User user = new User(
             request.getFirstname(),
             request.getLastname(),
@@ -33,7 +33,7 @@ public class RegistrationService {
             List.of("ROLE_USER")
         );
         String token = userService.signUpUser(user);
-        String confirmationLink = "http://localhost:8080/registration/confirmation?token=" + token;
+        String confirmationLink = currentUrl + "/confirmation?token=" + token;
         // emailSender.send(request.getEmail(), buildEmail(request.getFirstname(), confirmationLink));
         return confirmationLink;
     }

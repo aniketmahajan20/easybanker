@@ -13,16 +13,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.easybanker.entity.AuthenticationRequest;
 import com.example.demo.easybanker.entity.AuthenticationResponse;
 import com.example.demo.easybanker.entity.User;
+import com.example.demo.easybanker.request.TransactionRequest;
+import com.example.demo.easybanker.service.TransactionService;
 import com.example.demo.easybanker.service.UserService;
 import com.example.demo.easybanker.util.JwtUtil;
 
+import jakarta.validation.Valid;
+
 @RestController
+@RequestMapping("/api")
 public class EasyBankerController {
     public final UserService userService;
 
@@ -35,6 +39,9 @@ public class EasyBankerController {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private TransactionService transactionService;
 
     @Autowired
     private JwtUtil jwtTokenUtil;
@@ -59,22 +66,20 @@ public class EasyBankerController {
     }
 
     @GetMapping("/balance")
-    public int getBalance(@AuthenticationPrincipal User user) {
+    public double getBalance(@AuthenticationPrincipal User user) {
         return user.getBalance();
     }
 
-    @PostMapping(path = "/update-balance") 
-    public ResponseEntity<String> updateBalance(@AuthenticationPrincipal User user, @RequestParam("balance") int balance) {
+    @PostMapping(path = "/transact") 
+    public ResponseEntity<String> createTransaciton( @AuthenticationPrincipal User user, @Valid @RequestBody TransactionRequest transactionRequest) {
         if (user == null) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
         }
-
-        boolean updated = userService.updateUserBalance(user.getEmail(), balance);
-
-        if (updated) {
-            return ResponseEntity.ok("Balance updated successfully.");
+        boolean transactionPassed = transactionService.createNewTransaction(transactionRequest, user);
+        if (transactionPassed) {
+            return ResponseEntity.ok("Transaction successful.");
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Failed to process Transaction");
         }
     }
 }

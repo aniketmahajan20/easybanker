@@ -1,6 +1,5 @@
 package com.example.demo.easybanker.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.easybanker.request.RegistrationRequest;
 import com.example.demo.easybanker.service.RegistrationService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -20,14 +20,14 @@ public class RegistrationController {
     
     private RegistrationService registrationService;
 
-    @Autowired
     public RegistrationController(RegistrationService registrationService) {
         this.registrationService = registrationService;
     }
 
     @PostMapping
-    public ResponseEntity<String> register(@RequestBody @Valid RegistrationRequest request) {
-        return ResponseEntity.ok(registrationService.register(request));
+    public ResponseEntity<String> register(HttpServletRequest httpServletRequestequest, @RequestBody @Valid RegistrationRequest registrationRequest) {
+        String currentUrl = httpServletRequestequest.getRequestURL().toString();
+        return ResponseEntity.ok(registrationService.register(registrationRequest, currentUrl));
     }
 
     @GetMapping("/confirmation")

@@ -40,7 +40,7 @@ public class User implements UserDetails{
     private List<String> authorities = new ArrayList<>();
 
     @Column
-    private int balance = 0;
+    private double balance = 0;
 
     private Boolean locked = false;
     private Boolean enabled = false;
@@ -133,11 +133,11 @@ public class User implements UserDetails{
         this.authorities = authorities;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
     

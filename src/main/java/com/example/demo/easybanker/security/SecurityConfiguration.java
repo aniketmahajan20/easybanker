@@ -6,7 +6,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
@@ -70,17 +69,16 @@ public class SecurityConfiguration {
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(authorizeRequests ->
             authorizeRequests
-            .requestMatchers("/welcome").hasRole("ADMIN")
-            .requestMatchers("/balance").hasAnyRole("ADMIN","USER")
-            .requestMatchers("/update-balance").hasRole("USER")
+            .requestMatchers("/api/welcome").hasRole("ADMIN")
+            .requestMatchers("/api/balance").hasAnyRole("ADMIN","USER")
+            .requestMatchers("/api/transact").hasRole("USER")
             .requestMatchers("/registration/**").permitAll()
-            .requestMatchers("/authenticate").permitAll()
+            .requestMatchers("/api/authenticate").permitAll()
             .requestMatchers("/").permitAll()
             .anyRequest().authenticated()
         )
         .formLogin(formLogin -> formLogin.disable())
         .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        // .formLogin(withDefaults());
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
