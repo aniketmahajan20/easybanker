@@ -69,11 +69,11 @@ public class SecurityConfiguration {
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(authorizeRequests ->
             authorizeRequests
-            .requestMatchers("/api/welcome").hasRole("ADMIN")
             .requestMatchers("/api/balance").hasAnyRole("ADMIN","USER")
             .requestMatchers("/api/transact").hasRole("USER")
             .requestMatchers("/registration/**").permitAll()
             .requestMatchers("/api/authenticate").permitAll()
+            .requestMatchers("/api/welcome").permitAll()
             .requestMatchers("/").permitAll()
             .anyRequest().authenticated()
         )
